@@ -1,0 +1,6 @@
+.idea/
+.old/
+__pycache__/
+geckodriver.log
+maps/
+
