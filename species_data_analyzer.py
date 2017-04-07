@@ -1,0 +1,120 @@
+import pandas as pd
+
+import pickle
+import argparse
+from difflib import get_close_matches
+
+# ---------------- INPUT ----------------
+# Parse arguments
+parser = argparse.ArgumentParser(
+    description='Gather species counts for given families and analyze')
+parser.add_argument("-f", "--families", nargs='+',
+    help="Names of the families to be analyzed.")
+args = parser.parse_args()
+families = args.families
+
+folder_names = [
+    "CalFlora", "OregonFlora", "CPNWH_OR", "CPNWH_WA"
+    ]
+
+# These are the weights used to create the final score (a weighted avg)
+weights = {
+    "CalFlora":     1,
+    "OregonFlora":  1,
+    "CPNWH_OR":     1,
+    "CPNWH_WA":     1
+    }
+weights_df = pd.DataFrame.from_dict(weights, orient="index")
+weights_df.columns = ["weight"]
+weights_df['normed'] = weights_df['weight'] / weights_df['weight'].sum(axis=0)
+assert 0.999 < weights_df['normed'].sum(axis=0) < 1.001
+weights_df.drop('weight', axis=1, inplace=True)
+
+for family in families:
+    # Read data from files
+    data_frames = dict()
+    for folder in folder_names:
+        data_frames[folder] = pd.read_csv(
+            "./data/" + folder + "/" + family + "_species.csv", index_col=0
+            )
+
+    # Normalize data and combine into a single dataframe
+    normed_data = pd.DataFrame()
+    for key, df in data_frames.items():
+        df['normed'] = df['count'] / df['count'].sum(axis=0)
+        assert 0.999 < df['normed'].sum(axis=0) < 1.001
+        df.drop('count', axis=1, inplace=True)
+        normed_data = pd.concat([normed_data] + [df], axis=1)
+        normed_data.columns = list(normed_data.columns[:-1]) + [key]
+
+    # Replace NaN entries with zeros
+    normed_data = normed_data.fillna(0)
+
+    # Try to find alternate spellings
+    close_matches = []
+    indices = list(normed_data.index.values)
+    for index in indices:
+        matched_pair = get_close_matches(index, indices, cutoff=0.83, n=2)
+        if len(matched_pair) > 1 and matched_pair[::-1] not in close_matches:
+            close_matches.append(matched_pair)
+
+    # Since the two rows are possibly just different spellings or synonyms, we 
+    # can confirm this by seeing if the rows are "disjoint"; that is, if no two 
+    # columns are both nonzero.
+    for match in close_matches:
+        matched_rows = normed_data.loc[match]
+
+        are_disjoint = not any(
+            [all(matched_rows[col] != 0) for col in matched_rows]
+            )
+        # this code is ghetto but it's used below and I guess it works lol
+        if are_disjoint:
+            match.append(" *** ")
+        else:
+            match.append(" ")
+
+    # Merge alternate spellings (if desired)
+    while len(close_matches) > 0:
+        print(
+            "These pairs of species names look similar. "
+            "Should any be merged? If prefixed by ***, the rows are 'disjoint'"
+            )
+        for index, match in enumerate(close_matches):
+            print(match[2] + match[0] + "\n" + \
+                  match[2] + match[1] + " " + str(index) + "\n")
+
+        choices = input(
+            "Type index to merge, a space, then 'u'/'d' to merge up/down."
+            "\nType -1 to quit.\n"
+            ).split()
+        index_choice = int(choices[0])
+        if index_choice is -1:
+            break
+
+        merge_direction = choices[1]
+        if merge_direction == 'd':
+            sign = -1
+        elif merge_direction == 'u':
+            sign = +1
+        else:
+            raise
+
+        target, replacement = tuple(close_matches[index_choice][:2][::sign])
+        del close_matches[index_choice]
+        normed_data.loc[target] += normed_data.loc[replacement]
+        normed_data.drop([replacement], inplace=True)
+
+    # Create final score column
+    normed_data['score'] = normed_data.dot(weights_df)
+    assert 0.999 < normed_data['score'].sum(axis=0) < 1.001
+
+    normed_data.index = pd.MultiIndex.from_tuples(
+        list(map(tuple, normed_data.index.str.split())),
+        names=("genus", "species")
+        )
+    print(normed_data["score"].sum(level="genus"))
+    print(normed_data['score'])
+
+    #pickle.dump(normed_data, open("./scores/" + family + "_scores.p", "wb"))
+    normed_data.to_csv("./scores/" + family + "_scores.csv", columns=["score"])
+
