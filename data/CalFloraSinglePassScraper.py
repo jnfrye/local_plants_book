@@ -1,11 +1,11 @@
-"""Use this to parse results of searching CalFlora for ALL species in the area.
+"""Use this to scrape results of searching CalFlora for ALL species in the area.
 """
 
 from bs4 import BeautifulSoup
 import pandas as pd
 
 
-soup = BeautifulSoup(open("./CalFlora/all_species_search.html"))
+soup = BeautifulSoup(open("./CalFlora/all_species_search.html"), "lxml")
 
 results_table = soup.find(id="resultSlot")
 
@@ -18,10 +18,12 @@ for row in data_rows:
     species_count = int(
         row.find(title="display points").div.contents[0].split()[0]
         )
-    extracted_data.append((species_name, [species_count]))
+    extracted_data.append((species_name, species_count))
 
-df = pd.DataFrame.from_items(extracted_data, orient='index', columns=["count"])
-df.index.name = "name"
-
-df.to_csv("./CalFlora/all_species_counts.csv")
+all_species = pd.DataFrame(extracted_data, columns=["full_name", "count"])
+all_species.to_csv(
+    "./CalFlora/all_species_raw_data.csv", columns=['full_name', 'count'], 
+    index=False
+    )
+print("DONE!")
 

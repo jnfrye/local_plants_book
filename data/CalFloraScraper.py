@@ -48,23 +48,10 @@ for family in families:
     # ---------------- ANALYSIS ----------------
     # Convert to friendly format for writing CSV
     all_species = pd.DataFrame(species_list, columns=["full_name", "count"])
-
-    # Remove the variety info
-    all_species = pd.concat(
-        [all_species,
-         all_species['full_name'].str.split(' ', expand=True, n=2)],
-        axis=1
+    all_species.to_csv(
+        "./CalFlora/" + family + "_raw_data.csv",
+        columns=['full_name', 'count'], index=False
         )
-    if len(all_species.columns) > 4:
-        all_species.drop(2, axis=1, inplace=True)
-    all_species['binomial'] = all_species[0] + ' ' + all_species[1]
-
-    # Add up the counts for each species
-    species_counts = all_species.groupby('binomial')['count'].sum().to_frame()
-
-    print(family, '\t', species_counts['count'].sum(), '\t',
-          len(species_counts))
-    species_counts.to_csv('./CalFlora/' + family + '_species.csv')
 
     # For whatever reason, it won't load the next page unless I do this
     browser.get("about:blank")

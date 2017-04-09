@@ -1,0 +1,35 @@
+import pandas as pd
+
+import argparse
+
+# ---------------- INPUT ----------------
+# Parse arguments
+parser = argparse.ArgumentParser(
+    description='Parse CalFlora datasets for species counts for given families')
+parser.add_argument("-f", "--families", nargs='+',
+    help="Names of the families to be analyzed. "
+         "Enter 'all_species' to do that file!"
+    )
+args = parser.parse_args()
+families = args.families
+
+for family in families:
+    # Remove the variety info
+    all_species = pd.read_csv("./CalFlora/" + family + "_raw_data.csv")
+
+    all_species = pd.concat(
+        [all_species,
+         all_species['full_name'].str.split(' ', expand=True, n=2)],
+        axis=1
+        )
+    if len(all_species.columns) > 4:
+        all_species.drop(2, axis=1, inplace=True)
+    all_species['binomial'] = all_species[0] + ' ' + all_species[1]
+
+    # Add up the counts for each species
+    species_counts = all_species.groupby('binomial')['count'].sum().to_frame()
+
+    print(family, '\t', species_counts['count'].sum(), '\t',
+          len(species_counts))
+    species_counts.to_csv('./CalFlora/' + family + '_species.csv')
+
