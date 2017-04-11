@@ -36,19 +36,26 @@ for i in range(num_files):
             usecols=["Genus", "Specific Epithet", "Specimen Count"]
             )
     except FileNotFoundError:
-        print("File not find!")
+        print("File not find! Proceeding anyway.")
         continue
+    if df['Genus'].isnull().any():
+        print("!!! ERROR: NULL GENUS FOUND !!!")
+        raise
+    if df['Specimen Count'].isnull().any():
+        print("!!! ERROR: NULL SPECIMEN COUNT FOUND !!!")
+        raise
     datasets.append(df)
 
 # Combine the datasets
 all_species = pd.concat(datasets, ignore_index=True)
 
+import pdb; pdb.set_trace()
+
 # Some entries have no specific epithet
 # (e.g. when the observer could not determine it)
 # These show up as NaN; we replace these with a unique text to proceed
 all_species = all_species.replace(np.nan, "NAN")
-all_species['binomial'] = \
-    all_species['Genus'] + ' ' + all_species['Specific Epithet']
+all_species['binomial'] = all_species['Genus'] + ' ' + all_species['Specific Epithet']
 
 # The dataframe is degenerate; this combines those counts
 species_counts = all_species.groupby('binomial')['Specimen Count'] \
