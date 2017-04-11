@@ -41,21 +41,37 @@ herbaria = [
     ]
 
 # Loop through each herbarium
-erroneous_urls = []
+timed_out_herbaria = []
+erroneous_herbaria = []
 for i, herbarium in enumerate(herbaria):
+    print(str(i) + ": \tRequesting herbarium: \t" + herbarium)
     url = main_url + herbarium + region_url
     response = requests.get(url)
     if response.headers['Content-Type'] == 'text/html':
-        print("*** No CSV returned for herbarium: \t" + herbarium)
-        erroneous_urls.append(url)
+        print("*** No CSV returned!")
+        erroneous_herbaria.append(herbarium)
+        continue
+
+    if (response.elapsed.seconds == 30 or
+            '<' in response.text or '>' in response.text):
+        print("*** HIGHLY LIKELY that this download timed out!")
+    if ("Fatal error" in response.text):
+        if ("Maximum execution time of 30 seconds exceeded" in response.text):
+            print("\t!!! DOWNLOAD DEFINITELY TIMED OUT !!!")
+        print("*** CSV not saved!")
+        timed_out_herbaria.append(herbarium)
         continue
 
     file_path = './' + folder + file_prefix + "_raw_data" + str(i) + ".txt"
     with open(file_path, 'w') as output_file:
         output_file.write(response.text)
 
-if len(erroneous_urls) > 0:
-    print("\nThe following URLs did not produce CSV results:")
-    for url in erroneous_urls:
-        print(url + '\n')
+if len(erroneous_herbaria) > 0:
+    print("\nSome herbaria did not return CSVs.")
+    print("Here is a url to see why:\n")
+    print(main_url + ",".join(erroneous_herbaria) + region_url)
+
+if len(timed_out_herbaria) > 0:
+    print("\nSome herbaria timed out. Deal with these manually:")
+    print(timed_out_herbaria)
 
