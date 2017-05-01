@@ -3,4 +3,12 @@
 __pycache__/
 geckodriver.log
 maps/
+data/CalFlora/
+data/CPNWH_OR/
+data/CPNWH_WA/
+data/OregonFlora
+characters/
+drawings/
+analysis/partitions/
+analysis/scores/
 
