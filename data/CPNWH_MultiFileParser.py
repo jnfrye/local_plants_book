@@ -49,8 +49,6 @@ for i in range(num_files):
 # Combine the datasets
 all_species = pd.concat(datasets, ignore_index=True)
 
-import pdb; pdb.set_trace()
-
 # Some entries have no specific epithet
 # (e.g. when the observer could not determine it)
 # These show up as NaN; we replace these with a unique text to proceed
