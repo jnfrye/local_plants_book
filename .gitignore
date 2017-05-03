@@ -12,3 +12,6 @@ drawings/
 analysis/partitions/
 analysis/scores/
 
+*.txt
+*.csv
+*.nwk
