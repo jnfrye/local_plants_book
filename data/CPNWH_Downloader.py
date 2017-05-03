@@ -8,6 +8,7 @@ import pandas as pd
 import requests
 
 import argparse
+import string
 
 
 # Parse arguments
@@ -31,7 +32,9 @@ main_url = (
     )
 
 with open('CPNWH_' + region + '_polygon.txt', 'r') as text_file:
-    region_url = text_file.read().strip()
+    region_query = text_file.read().strip()
+
+family_url = "&QueryCount=1&Family1="
 
 herbaria = [
     "ALA", "BABY", "BBLM", "BLMMD", "BOIS", "CIC", "CRMO", "EVE", "EWU", "FHL",
@@ -41,37 +44,49 @@ herbaria = [
     ]
 
 # Loop through each herbarium
-timed_out_herbaria = []
-erroneous_herbaria = []
+unknown_error_herbaria = []
+empty_herbaria = []
 for i, herbarium in enumerate(herbaria):
     print(str(i) + ": \tRequesting herbarium: \t" + herbarium)
-    url = main_url + herbarium + region_url
+    url = main_url + herbarium + region_query
     response = requests.get(url)
     if response.headers['Content-Type'] == 'text/html':
         print("*** No CSV returned!")
-        erroneous_herbaria.append(herbarium)
+        empty_herbaria.append(herbarium)
         continue
 
     if (response.elapsed.seconds == 30 or
             '<' in response.text or '>' in response.text):
         print("*** HIGHLY LIKELY that this download timed out!")
     if ("Fatal error" in response.text):
-        if ("Maximum execution time of 30 seconds exceeded" in response.text):
-            print("\t!!! DOWNLOAD DEFINITELY TIMED OUT !!!")
-        print("*** CSV not saved!")
-        timed_out_herbaria.append(herbarium)
+        if ("Maximum execution time of 30 seconds exceeded"
+                not in response.text):
+            print("\t!!! Unknown error; CSV not saved !!!")
+            unknown_error_herbaria.append(herbarium)
+            continue
+
+        # TODO This code is getting messy, I gotta refactor it a little
+        # TODO It's getting confusing because I need to redo the checks above 
+        # TODO for each of these new URLs
+        # TODO I think it might be easier to add an "alphabet search mode"
+        # TODO to the argparse and have the user re-run the script
+        print("*** Timeout confirmed.")
+        print("*** Splitting requests by first letter of family name...")
+        for letter in string.ascii_uppercase:
+            family_query = family_url + letter + '%'
+            url = main_url + herbarium + family_query + region_query
         continue
 
     file_path = './' + folder + file_prefix + "_raw_data" + str(i) + ".txt"
     with open(file_path, 'w') as output_file:
         output_file.write(response.text)
 
-if len(erroneous_herbaria) > 0:
+if len(empty_herbaria) > 0:
     print("\nSome herbaria did not return CSVs.")
     print("Here is a url to see why:\n")
-    print(main_url + ",".join(erroneous_herbaria) + region_url)
+    print(main_url + ",".join(empty_herbaria) + region_query)
 
-if len(timed_out_herbaria) > 0:
-    print("\nSome herbaria timed out. Deal with these manually:")
-    print(timed_out_herbaria)
+if len(unknown_error_herbaria) > 0:
+    print("\nSome herbaria had unknown errors. Deal with these manually:")
+    print(unknown_error_herbaria)
 
