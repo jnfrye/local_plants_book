@@ -2,8 +2,7 @@ from selenium import webdriver
 import pandas as pd
 
 import argparse
-import sys; sys.path.append("..")
-import scraping
+from observations.scrape.common import scraping
 
 # ---------------- INPUT ----------------
 # Parse arguments

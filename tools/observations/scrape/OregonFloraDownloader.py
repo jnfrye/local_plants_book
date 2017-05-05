@@ -1,26 +1,30 @@
-from selenium import webdriver
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.keys import Keys
-import pandas as pd
+"""Script for downloading observation data from OregonFlora
+"""
 
 import shutil
 import argparse
 import time
 import os.path
 
-import sys; sys.path.append("..")
-import scraping
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.keys import Keys
+
+# TODO I've gotta learn how python imports work lol
+import common as scraping
+
+import pdb; pdb.set_trace()
 
 # ---------------- INPUT ----------------
 # Parse arguments
 parser = argparse.ArgumentParser(
     description='Download family observation data from OregonFlora')
 parser.add_argument("-f", "--families", nargs='+',
-    help="Names of the families to be analyzed.")
-args = parser.parse_args()
-families = args.families
+                    help="Names of the families to be analyzed.")
+ARGS = parser.parse_args()
+FAMILIES = ARGS.families
 
-folder = './OregonFlora/'
+FOLDER = './OregonFlora/'
 
 # ---------------- SETUP ----------------
 print("Opening browser...")
@@ -30,7 +34,7 @@ fp.set_preference("browser.download.folderList", 2)
 fp.set_preference("browser.download.manager.showWhenStarting", False)
 fp.set_preference("browser.download.dir", os.getcwd())
 fp.set_preference(
-    "browser.helperApps.neverAsk.saveToDisk", 
+    "browser.helperApps.neverAsk.saveToDisk",
     "application/csv; charset=UTF-8")
 
 browser = webdriver.Firefox(firefox_profile=fp)
@@ -39,7 +43,7 @@ browser.set_window_position(200, 200)
 
 # ---------------- SCRAPING ----------------
 # Load the search webpage
-for family in families:
+for family in FAMILIES:
     print("Loading atlas...")
     browser.get("http://www.oregonflora.org/atlas.php")
     scraping.wait_for_load(browser, "ID", "btnInstructions")
@@ -87,9 +91,8 @@ for family in families:
             break
     time.sleep(.5)
 
-    shutil.move("results.csv", folder + family + ".csv")
+    shutil.move("results.csv", FOLDER + family + ".csv")
     print(family + " finished!")
     browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
 
 browser.quit()
-

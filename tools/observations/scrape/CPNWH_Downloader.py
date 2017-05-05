@@ -4,39 +4,38 @@ To prevent timeout errors with their server, the data is downloaded from each
 herbaria separately.
 """
 
-import pandas as pd
-import requests
-
 import argparse
 import string
 
+import requests
+
 
 # Parse arguments
-parser = argparse.ArgumentParser(
+PARSER = argparse.ArgumentParser(
     description='Download CPNWH data into multiple files')
-parser.add_argument(
+PARSER.add_argument(
     "-r", "--region", type=str, choices=['OR', 'WA'], required=True,
     help="Region to use."
     )
-args = parser.parse_args()
-region = args.region
+ARGS = PARSER.parse_args()
+REGION = ARGS.region
 
-folder = 'CPNWH_' + region + '/raw_data/'
-file_prefix = "all_species"
+FOLDER = 'CPNWH_' + REGION + '/raw_data/'
+FILE_PREFIX = "all_species"
 
 # Gather components of URL
-main_url = (
+MAIN_URL = (
     "http://www.pnwherbaria.org/data/results.php?DisplayAs=Checklist"
     "&DisplayOption=Tab&ExcludeCultivated=Y&GroupBy=ungrouped"
     "&SortBy=ScientificName&SortOrder=ASC&Herbaria="
     )
 
-with open('CPNWH_' + region + '_polygon.txt', 'r') as text_file:
-    region_query = text_file.read().strip()
+with open('CPNWH_' + REGION + '_polygon.txt', 'r') as text_file:
+    REGION_QUERY = text_file.read().strip()
 
-family_url = "&QueryCount=1&Family1="
+FAMILY_URL = "&QueryCount=1&Family1="
 
-herbaria = [
+HERBARIA = [
     "ALA", "BABY", "BBLM", "BLMMD", "BOIS", "CIC", "CRMO", "EVE", "EWU", "FHL",
     "HJAEF", "HPSU", "HSC", "ID", "IDS", "LEA", "LINF", "MONT", "MONTU", "NY",
     "OSC", "PLU", "PNNL", "PSM", "REED", "RM", "SOC", "SRP", "UAAH", "UBC", "V",
@@ -46,9 +45,9 @@ herbaria = [
 # Loop through each herbarium
 unknown_error_herbaria = []
 empty_herbaria = []
-for i, herbarium in enumerate(herbaria):
+for i, herbarium in enumerate(HERBARIA):
     print(str(i) + ": \tRequesting herbarium: \t" + herbarium)
-    url = main_url + herbarium + region_query
+    url = MAIN_URL + herbarium + REGION_QUERY
     response = requests.get(url)
     if response.headers['Content-Type'] == 'text/html':
         print("*** No CSV returned!")
@@ -58,7 +57,7 @@ for i, herbarium in enumerate(herbaria):
     if (response.elapsed.seconds == 30 or
             '<' in response.text or '>' in response.text):
         print("*** HIGHLY LIKELY that this download timed out!")
-    if ("Fatal error" in response.text):
+    if "Fatal error" in response.text:
         if ("Maximum execution time of 30 seconds exceeded"
                 not in response.text):
             print("\t!!! Unknown error; CSV not saved !!!")
@@ -66,27 +65,26 @@ for i, herbarium in enumerate(herbaria):
             continue
 
         # TODO This code is getting messy, I gotta refactor it a little
-        # TODO It's getting confusing because I need to redo the checks above 
+        # TODO It's getting confusing because I need to redo the checks above
         # TODO for each of these new URLs
         # TODO I think it might be easier to add an "alphabet search mode"
         # TODO to the argparse and have the user re-run the script
         print("*** Timeout confirmed.")
         print("*** Splitting requests by first letter of family name...")
         for letter in string.ascii_uppercase:
-            family_query = family_url + letter + '%'
-            url = main_url + herbarium + family_query + region_query
+            family_query = FAMILY_URL + letter + '%'
+            url = MAIN_URL + herbarium + family_query + REGION_QUERY
         continue
 
-    file_path = './' + folder + file_prefix + "_raw_data" + str(i) + ".txt"
+    file_path = './' + FOLDER + FILE_PREFIX + "_raw_data" + str(i) + ".txt"
     with open(file_path, 'w') as output_file:
         output_file.write(response.text)
 
 if len(empty_herbaria) > 0:
     print("\nSome herbaria did not return CSVs.")
     print("Here is a url to see why:\n")
-    print(main_url + ",".join(empty_herbaria) + region_query)
+    print(MAIN_URL + ",".join(empty_herbaria) + REGION_QUERY)
 
 if len(unknown_error_herbaria) > 0:
     print("\nSome herbaria had unknown errors. Deal with these manually:")
     print(unknown_error_herbaria)
-
