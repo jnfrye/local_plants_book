@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
 # TODO I've gotta learn how python imports work lol
-import common as scraping
+import PyFloraBook.observations.scrape.web_interface as scraping
 
 import pdb; pdb.set_trace()
 
