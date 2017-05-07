@@ -30,6 +30,5 @@ def main():
     print("\nDONE!")
 
 if __name__ == "__main__":
-    # TODO Disabled for now (not needed with new project layout)
-    # main()
+    main()
     pass
