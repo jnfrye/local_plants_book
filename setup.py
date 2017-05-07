@@ -2,11 +2,7 @@ import sys
 import site
 
 
-# TODO Eventually, I want to this to do things like create symlinks to the
-# TODO scripts on linux computers (maybe)
-
-# TODO Instead of hard-coding "PyFloraBook", maybe get it from project
-PROJECT_FOLDER = "/PyFloraBook"
+PROJECT_FOLDER = "/"
 
 
 def main():
@@ -19,7 +15,8 @@ def main():
     else:
         raise ValueError("Multiple site-packages found!")
 
-    custom_site_file = site_package_directory + PROJECT_FOLDER + ".pth"
+    custom_site_file = \
+        site_package_directory + PROJECT_FOLDER + "PyFloraBook.pth"
     source_directory = sys.path[0] + PROJECT_FOLDER
     print("Writing source directory ({}) to custom *.pth file:\n\n{}".format(
         '.' + PROJECT_FOLDER, custom_site_file
@@ -31,4 +28,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    pass
