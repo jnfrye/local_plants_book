@@ -2,7 +2,8 @@ from selenium import webdriver
 import pandas as pd
 
 import argparse
-from observations.scrape.common import scraping
+
+import PyFloraBook.web.communication as scraping
 
 # ---------------- INPUT ----------------
 # Parse arguments

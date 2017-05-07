@@ -10,10 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
-# TODO I've gotta learn how python imports work lol
-import PyFloraBook.observations.scrape.web_interface as scraping
-
-import pdb; pdb.set_trace()
+import PyFloraBook.web.communication as scraping
 
 # ---------------- INPUT ----------------
 # Parse arguments

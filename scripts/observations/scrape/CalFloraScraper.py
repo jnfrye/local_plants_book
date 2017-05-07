@@ -2,8 +2,8 @@ from selenium import webdriver
 import pandas as pd
 
 import argparse
-import sys; sys.path.append("..")
-import scraping
+
+import PyFloraBook.web.communication as scraping
 
 # ---------------- INPUT ----------------
 # Parse arguments
@@ -25,8 +25,8 @@ for family in families:
     # Load the webpage
     try:
         browser.get(
-            "http://www.calflora.org/entry/wgh.html#srch=t&family=" 
-            + family + 
+            "http://www.calflora.org/entry/wgh.html#srch=t&family="
+            + family +
             "&group=none&fmt=simple&y=39.493&x=-119.6979&z=5&rid=rs940")
     except:
         pass  # lol
