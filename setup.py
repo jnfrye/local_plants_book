@@ -2,10 +2,14 @@ import sys
 import site
 
 
+# TODO Eventually, I want to this to do things like create symlinks to the
+# TODO scripts on linux computers (maybe)
+
 # TODO Instead of hard-coding "PyFloraBook", maybe get it from project
 PROJECT_FOLDER = "/PyFloraBook"
 
-if __name__ == "__main__":
+
+def main():
     package_directories = site.getsitepackages()
     site_packages = [x for x in package_directories if 'site-packages' in x]
     if len(site_packages) == 0:
@@ -24,3 +28,8 @@ if __name__ == "__main__":
         pth_file.write(source_directory)
 
     print("\nDONE!")
+
+if __name__ == "__main__":
+    # TODO Disabled for now (not needed with new project layout)
+    # main()
+    pass
