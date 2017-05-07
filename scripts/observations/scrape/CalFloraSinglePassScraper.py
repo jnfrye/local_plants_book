@@ -22,8 +22,7 @@ for row in data_rows:
 
 all_species = pd.DataFrame(extracted_data, columns=["full_name", "count"])
 all_species.to_csv(
-    "./CalFlora/all_species_raw_data.csv", columns=['full_name', 'count'], 
+    "./CalFlora/all_species_raw_data.csv", columns=['full_name', 'count'],
     index=False
     )
 print("DONE!")
-
