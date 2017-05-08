@@ -15,7 +15,7 @@ def load_configuration() -> dict:
     # This assumes that the PyFloraBook __init__ file is contained in a
     # sub-folder of the project path
     project_path = source_path.parent
-    configuration = project_path / "configuration.json"
+    configuration = Path(project_path / "configuration.json")
     with configuration.open() as config_file:
         return json.load(config_file)
 
