@@ -5,6 +5,10 @@ import inspect
 import PyFloraBook
 
 
+OBSERVATIONS_FOLDER = "observation_data"
+RAW_DATA_FOLDER = "raw"
+
+
 def locate_project_folder() -> Path:
     """Locate top-level project folder
 
@@ -24,6 +28,15 @@ def locate_data_folder() -> Path:
         Path of data IO folder
     """
     return Path(load_configuration()["data_folder"])
+
+
+def locate_raw_data_folder() -> Path:
+    """Return path of the raw data folder
+
+    Returns:
+        Path of raw data folder
+    """
+    return locate_data_folder() / OBSERVATIONS_FOLDER / RAW_DATA_FOLDER
 
 
 def load_configuration() -> dict:
