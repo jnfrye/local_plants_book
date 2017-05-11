@@ -17,6 +17,15 @@ def locate_project_folder() -> Path:
     return source_path.parent
 
 
+def locate_data_folder() -> Path:
+    """Return path of the data IO folder
+
+    Returns:
+        Path of data IO folder
+    """
+    return Path(load_configuration()["data_folder"])
+
+
 def load_configuration() -> dict:
     """Load project configuration info
 
