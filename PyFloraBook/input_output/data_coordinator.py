@@ -1,6 +1,7 @@
 from pathlib import Path
 import json
 import inspect
+import sys
 
 import PyFloraBook
 
@@ -48,3 +49,12 @@ def load_configuration() -> dict:
     configuration = Path(locate_project_folder() / "configuration.json")
     with configuration.open() as config_file:
         return json.load(config_file)
+
+
+def locate_current_script_folder() -> Path:
+    """Return path of the currently running script
+
+    Returns:
+        Path of current script
+    """
+    return Path(sys.path[0])
