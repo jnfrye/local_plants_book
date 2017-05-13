@@ -9,6 +9,8 @@ import string
 
 import requests
 
+import PyFloraBook.input_output.data_coordinator as dc
+
 
 # Parse arguments
 PARSER = argparse.ArgumentParser(
@@ -20,20 +22,14 @@ PARSER.add_argument(
 ARGS = PARSER.parse_args()
 REGION = ARGS.region
 
-FOLDER = 'CPNWH_' + REGION + '/raw_data/'
-FILE_PREFIX = "all_species"
+SITE_NAME = 'CPNWH_' + REGION
 
-# Gather components of URL
-MAIN_URL = (
-    "http://www.pnwherbaria.org/data/results.php?DisplayAs=Checklist"
-    "&DisplayOption=Tab&ExcludeCultivated=Y&GroupBy=ungrouped"
-    "&SortBy=ScientificName&SortOrder=ASC&Herbaria="
-    )
+SCRIPT_PATH = dc.locate_current_script_folder()
+POLYGON_FILE_NAME = SITE_NAME + '_polygon.txt'
+POLYGON_FILE_PATH = SCRIPT_PATH / POLYGON_FILE_NAME
 
-with open('CPNWH_' + REGION + '_polygon.txt', 'r') as text_file:
-    REGION_QUERY = text_file.read().strip()
-
-FAMILY_URL = "&QueryCount=1&Family1="
+with POLYGON_FILE_PATH.open(mode='r') as polygon_file:
+    REGION_QUERY = polygon_file.read().strip()
 
 HERBARIA = [
     "ALA", "BABY", "BBLM", "BLMMD", "BOIS", "CIC", "CRMO", "EVE", "EWU", "FHL",
@@ -42,12 +38,24 @@ HERBARIA = [
     "VALE", "VIU", "WCW", "WS", "WSTC", "WTU", "WWB"
     ]
 
-# Loop through each herbarium
+HERBARIA_QUERY = "&Herbaria="
+
+# Gather components of URL
+MAIN_URL = (
+    "http://www.pnwherbaria.org/data/results.php?DisplayAs=Checklist"
+    "&DisplayOption=Tab&ExcludeCultivated=Y&GroupBy=ungrouped"
+    "&SortBy=ScientificName&SortOrder=ASC&QueryCount=1"
+    )
+FAMILY_QUERY = "&Family1="
+
+OUTPUT_PATH = dc.locate_raw_data_folder()
+OUTPUT_FILE_PREFIX = "all_species"
+
 unknown_error_herbaria = []
 empty_herbaria = []
 for i, herbarium in enumerate(HERBARIA):
     print(str(i) + ": \tRequesting herbarium: \t" + herbarium)
-    url = MAIN_URL + herbarium + REGION_QUERY
+    url = MAIN_URL + (HERBARIA_QUERY + herbarium) + REGION_QUERY
     response = requests.get(url)
     if response.headers['Content-Type'] == 'text/html':
         print("*** No CSV returned!")
@@ -64,20 +72,18 @@ for i, herbarium in enumerate(HERBARIA):
             unknown_error_herbaria.append(herbarium)
             continue
 
-        # TODO This code is getting messy, I gotta refactor it a little
-        # TODO It's getting confusing because I need to redo the checks above
-        # TODO for each of these new URLs
-        # TODO I think it might be easier to add an "alphabet search mode"
-        # TODO to the argparse and have the user re-run the script
+        # TODO I need to redo the checks above for each of these new URLs
+        # TODO Maybe add an "alphabet search mode" to the argparse
         print("*** Timeout confirmed.")
         print("*** Splitting requests by first letter of family name...")
         for letter in string.ascii_uppercase:
-            family_query = FAMILY_URL + letter + '%'
-            url = MAIN_URL + herbarium + family_query + REGION_QUERY
+            alphabetical_family_query = FAMILY_QUERY + letter + '%'
+            url += alphabetical_family_query
         continue
 
-    file_path = './' + FOLDER + FILE_PREFIX + "_raw_data" + str(i) + ".txt"
-    with open(file_path, 'w') as output_file:
+    file_name = OUTPUT_FILE_PREFIX + "_part" + str(i) + ".txt"
+    file_path = OUTPUT_PATH / SITE_NAME / file_name
+    with file_path.open(mode='w') as output_file:
         output_file.write(response.text)
 
 if len(empty_herbaria) > 0:
