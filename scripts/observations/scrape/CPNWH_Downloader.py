@@ -28,8 +28,9 @@ SCRIPT_PATH = dc.locate_current_script_folder()
 POLYGON_FILE_NAME = SITE_NAME + '_polygon.txt'
 POLYGON_FILE_PATH = SCRIPT_PATH / POLYGON_FILE_NAME
 
+POLYGON_QUERY = "&PolygonCount=1&Polygon1="
 with POLYGON_FILE_PATH.open(mode='r') as polygon_file:
-    REGION_QUERY = polygon_file.read().strip()
+    polygon = polygon_file.read().strip()
 
 HERBARIA = [
     "ALA", "BABY", "BBLM", "BLMMD", "BOIS", "CIC", "CRMO", "EVE", "EWU", "FHL",
@@ -45,7 +46,10 @@ MAIN_URL = (
     "http://www.pnwherbaria.org/data/results.php?DisplayAs=Checklist"
     "&DisplayOption=Tab&ExcludeCultivated=Y&GroupBy=ungrouped"
     "&SortBy=ScientificName&SortOrder=ASC&QueryCount=1"
+    "&Zoom=7&Lat=46.71797026962876&Lng=-123.013916015625"
     )
+region_url = MAIN_URL + POLYGON_QUERY + polygon
+
 FAMILY_QUERY = "&Family1="
 
 OUTPUT_PATH = dc.locate_raw_data_folder()
@@ -55,8 +59,8 @@ unknown_error_herbaria = []
 empty_herbaria = []
 for i, herbarium in enumerate(HERBARIA):
     print(str(i) + ": \tRequesting herbarium: \t" + herbarium)
-    url = MAIN_URL + (HERBARIA_QUERY + herbarium) + REGION_QUERY
-    response = requests.get(url)
+    herbarium_url = region_url + (HERBARIA_QUERY + herbarium)
+    response = requests.get(herbarium_url)
     if response.headers['Content-Type'] == 'text/html':
         print("*** No CSV returned!")
         empty_herbaria.append(herbarium)
@@ -78,7 +82,7 @@ for i, herbarium in enumerate(HERBARIA):
         print("*** Splitting requests by first letter of family name...")
         for letter in string.ascii_uppercase:
             alphabetical_family_query = FAMILY_QUERY + letter + '%'
-            url += alphabetical_family_query
+            alphabetical_url = herbarium_url + alphabetical_family_query
         continue
 
     file_name = OUTPUT_FILE_PREFIX + "_part" + str(i) + ".txt"
@@ -89,7 +93,7 @@ for i, herbarium in enumerate(HERBARIA):
 if len(empty_herbaria) > 0:
     print("\nSome herbaria did not return CSVs.")
     print("Here is a url to see why:\n")
-    print(MAIN_URL + ",".join(empty_herbaria) + REGION_QUERY)
+    print(region_url + HERBARIA_QUERY + ",".join(empty_herbaria))
 
 if len(unknown_error_herbaria) > 0:
     print("\nSome herbaria had unknown errors. Deal with these manually:")
