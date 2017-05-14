@@ -6,8 +6,10 @@ import sys
 import PyFloraBook
 
 
+# Globals
 OBSERVATIONS_FOLDER = "observation_data"
-RAW_DATA_FOLDER = "raw"
+RAW_OBSERVATIONS_FOLDER = "raw_observations"
+RAW_COUNTS_FOLDER = "raw_counts"
 
 
 def locate_project_folder() -> Path:
@@ -31,13 +33,23 @@ def locate_data_folder() -> Path:
     return Path(load_configuration()["data_folder"])
 
 
-def locate_raw_data_folder() -> Path:
-    """Return path of the raw data folder
+def locate_raw_observations_folder() -> Path:
+    """Return path of the raw observations data folder
 
     Returns:
-        Path of raw data folder
+        Path of raw observations data folder
     """
-    return locate_data_folder() / OBSERVATIONS_FOLDER / RAW_DATA_FOLDER
+    return (locate_data_folder() / OBSERVATIONS_FOLDER /
+            RAW_OBSERVATIONS_FOLDER)
+
+
+def locate_raw_counts_folder() -> Path:
+    """Return path of the raw counts data folder
+
+    Returns:
+        Path of raw counts data folder
+    """
+    return locate_data_folder() / OBSERVATIONS_FOLDER / RAW_COUNTS_FOLDER
 
 
 def load_configuration() -> dict:
