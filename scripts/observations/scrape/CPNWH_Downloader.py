@@ -15,9 +15,9 @@ import PyFloraBook.input_output.data_coordinator as dc
 # Globals
 # These are URL queries
 QUERIES = {
-    "polygon": "&PolygonCount=1&Polygon1=",
+    "polygon":  "&PolygonCount=1&Polygon1=",
     "herbaria": "&Herbaria=",
-    "family": "&Family1=",
+    "family":   "&Family1=",
     }
 
 HERBARIA = [
@@ -38,7 +38,8 @@ OUTPUT_FILE_PREFIX = "all_species"
 
 # Parse arguments
 PARSER = argparse.ArgumentParser(
-    description='Download CPNWH data into multiple files')
+    description='Download CPNWH data into multiple files'
+    )
 PARSER.add_argument(
     "-r", "--region", type=str, choices=['OR', 'WA'], required=True,
     help="Region to use."
