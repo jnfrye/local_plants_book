@@ -28,7 +28,7 @@ browser = webdriver.Firefox()
 browser.set_window_size(500, 300)
 browser.set_window_position(200, 200)
 
-output_path = dc.locate_raw_data_folder() / SITE_NAME
+output_path = dc.locate_raw_counts_folder() / SITE_NAME
 
 for family in families:
     # Load the webpage
