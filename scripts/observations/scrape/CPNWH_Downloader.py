@@ -60,15 +60,15 @@ region_url = MAIN_URL + QUERIES["polygon"] + polygon
 
 output_path = dc.locate_raw_data_folder()
 
-unknown_error_herbaria = []
-empty_herbaria = []
+herbaria_with_unknown_error = []
+herbaria_without_csv = []
 for i, herbarium in enumerate(HERBARIA):
     print(str(i) + ": \tRequesting herbarium: \t" + herbarium)
     herbarium_url = region_url + (QUERIES["herbaria"] + herbarium)
     response = requests.get(herbarium_url)
     if response.headers['Content-Type'] == 'text/html':
         print("*** No CSV returned!")
-        empty_herbaria.append(herbarium)
+        herbaria_without_csv.append(herbarium)
         continue
 
     if (response.elapsed.seconds == 30 or
@@ -78,7 +78,7 @@ for i, herbarium in enumerate(HERBARIA):
         if ("Maximum execution time of 30 seconds exceeded"
                 not in response.text):
             print("\t!!! Unknown error; CSV not saved !!!")
-            unknown_error_herbaria.append(herbarium)
+            herbaria_with_unknown_error.append(herbarium)
             continue
 
         # TODO I need to redo the checks above for each of these new URLs
@@ -95,11 +95,11 @@ for i, herbarium in enumerate(HERBARIA):
     with file_path.open(mode='w') as output_file:
         output_file.write(response.text)
 
-if len(empty_herbaria) > 0:
+if len(herbaria_without_csv) > 0:
     print("\nSome herbaria did not return CSVs.")
     print("Here is a url to see why:\n")
-    print(region_url + QUERIES["herbaria"] + ",".join(empty_herbaria))
+    print(region_url + QUERIES["herbaria"] + ",".join(herbaria_without_csv))
 
-if len(unknown_error_herbaria) > 0:
+if len(herbaria_with_unknown_error) > 0:
     print("\nSome herbaria had unknown errors. Deal with these manually:")
-    print(unknown_error_herbaria)
+    print(herbaria_with_unknown_error)
