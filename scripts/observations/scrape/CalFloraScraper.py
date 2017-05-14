@@ -7,13 +7,19 @@ import PyFloraBook.web.communication as scraping
 import PyFloraBook.input_output.data_coordinator as dc
 
 
+# ---------------- GLOBALS ----------------
+SITE_NAME = "CalFlora"
+
 # ---------------- INPUT ----------------
 # Parse arguments
-parser = argparse.ArgumentParser(
-    description='Scrape CalFlora for species counts for given family')
-parser.add_argument("-f", "--families", nargs='+',
-    help="Names of the families to be analyzed.")
-args = parser.parse_args()
+PARSER = argparse.ArgumentParser(
+    description='Scrape CalFlora for species counts for given family'
+    )
+PARSER.add_argument(
+    "-f", "--families", nargs='+',
+    help="Names of the families to be analyzed."
+    )
+args = PARSER.parse_args()
 families = args.families
 
 # ---------------- SCRAPING ----------------
@@ -22,8 +28,7 @@ browser = webdriver.Firefox()
 browser.set_window_size(500, 300)
 browser.set_window_position(200, 200)
 
-SITE_NAME = "CalFlora"
-OUTPUT_PATH = dc.locate_raw_data_folder() / SITE_NAME
+output_path = dc.locate_raw_data_folder() / SITE_NAME
 
 for family in families:
     # Load the webpage
@@ -51,7 +56,7 @@ for family in families:
 
     # ---------------- ANALYSIS ----------------
     # Convert to friendly format for writing CSV
-    family_results_path = str(OUTPUT_PATH / (family + "_raw_data.csv"))
+    family_results_path = str(output_path / (family + "_raw_data.csv"))
     all_species = pd.DataFrame(species_list, columns=["full_name", "count"])
     all_species.to_csv(
         family_results_path,
