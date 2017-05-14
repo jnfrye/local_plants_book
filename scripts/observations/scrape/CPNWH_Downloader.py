@@ -21,10 +21,10 @@ QUERIES = {
     }
 
 HERBARIA = [
-    "ALA", "BABY", "BBLM", "BLMMD", "BOIS", "CIC", "CRMO", "EVE", "EWU", "FHL",
-    "HJAEF", "HPSU", "HSC", "ID", "IDS", "LEA", "LINF", "MONT", "MONTU", "NY",
-    "OSC", "PLU", "PNNL", "PSM", "REED", "RM", "SOC", "SRP", "UAAH", "UBC", "V",
-    "VALE", "VIU", "WCW", "WS", "WSTC", "WTU", "WWB",
+    "ALA", "BABY", "BBLM", "BLMMD", "BOIS", "CIC", "CRMO", "EVE", "EWU",
+    "FHL", "HJAEF", "HPSU", "HSC", "ID", "IDS", "LEA", "LINF", "MONT",
+    "MONTU", "NY", "OSC", "PLU", "PNNL", "PSM", "REED", "RM", "SOC", "SRP",
+    "UAAH", "UBC", "V", "VALE", "VIU", "WCW", "WS", "WSTC", "WTU", "WWB",
     ]
 
 MAIN_URL = (
