@@ -58,7 +58,7 @@ with polygon_file_path.open(mode='r') as polygon_file:
 # Gather components of URL
 region_url = MAIN_URL + QUERIES["polygon"] + polygon
 
-output_path = dc.locate_raw_data_folder()
+output_path = dc.locate_raw_observations_folder()
 
 herbaria_with_unknown_error = []
 herbaria_without_csv = []
