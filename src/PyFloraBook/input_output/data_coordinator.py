@@ -13,10 +13,10 @@ RAW_COUNTS_FOLDER = "raw_counts"
 
 
 def locate_project_folder() -> Path:
-    """Locate top-level project folder
+    """Locate top-level project source folder
 
     Returns:
-        Path of the project folder
+        Path of the project source folder
     """
     source_path = Path(inspect.getsourcefile(PyFloraBook)).parent
     # This assumes that the highest-level project __init__ file is contained
