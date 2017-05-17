@@ -2,21 +2,33 @@ import pandas as pd
 
 import argparse
 
+import PyFloraBook.input_output.data_coordinator as dc
+
+
+# ---------------- GLOBALS ----------------
+WEBSITE = "CalFlora"
+
 # ---------------- INPUT ----------------
 # Parse arguments
 parser = argparse.ArgumentParser(
-    description='Parse CalFlora datasets for species counts for given families')
-parser.add_argument("-f", "--families", nargs='+',
+    description='Parse CalFlora datasets for given families species counts'
+    )
+parser.add_argument(
+    "-f", "--families", nargs='+',
     help="Names of the families to be analyzed. "
          "Enter 'all_species' to do that file!"
     )
 args = parser.parse_args()
 families = args.families
 
+raw_data_folder = dc.locate_raw_counts_folder() / WEBSITE
+cleansed_data_folder = dc.locate_cleansed_data_folder() / WEBSITE
 for family in families:
     # Remove the variety info
-    all_species = pd.read_csv("./CalFlora/" + family + "_raw_data.csv")
+    raw_data_file = raw_data_folder / (family + "_raw_data.csv")
+    all_species = pd.read_csv(str(raw_data_file))
 
+    # Strip the 'variety' and 'subspecies' nomenclature
     all_species = pd.concat(
         [all_species,
          all_species['full_name'].str.split(' ', expand=True, n=2)],
@@ -29,7 +41,8 @@ for family in families:
     # Add up the counts for each species
     species_counts = all_species.groupby('binomial')['count'].sum().to_frame()
 
+    # Output
     print(family, '\t', species_counts['count'].sum(), '\t',
           len(species_counts))
-    species_counts.to_csv('./CalFlora/' + family + '_species.csv')
-
+    cleansed_data_file = cleansed_data_folder / (family + '_species.csv')
+    species_counts.to_csv(str(cleansed_data_file))
