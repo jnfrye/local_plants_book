@@ -10,9 +10,10 @@ import PyFloraBook
 OBSERVATIONS_FOLDER = "observation_data"
 RAW_OBSERVATIONS_FOLDER = "raw_observations"
 RAW_COUNTS_FOLDER = "raw_counts"
+CLEANSED_FOLDER = "cleansed"
 
 
-def locate_project_folder() -> Path:
+def locate_source_folder() -> Path:
     """Locate top-level project source folder
 
     Returns:
@@ -22,6 +23,17 @@ def locate_project_folder() -> Path:
     # This assumes that the highest-level project __init__ file is contained
     # in a sub-folder of the project folder
     return source_path.parent
+
+
+def load_configuration() -> dict:
+    """Load project configuration info
+
+    Returns:
+        Dictionary of configuration info.
+    """
+    configuration = Path(locate_source_folder().parent / "configuration.json")
+    with configuration.open() as config_file:
+        return json.load(config_file)
 
 
 def locate_data_folder() -> Path:
@@ -52,15 +64,13 @@ def locate_raw_counts_folder() -> Path:
     return locate_data_folder() / OBSERVATIONS_FOLDER / RAW_COUNTS_FOLDER
 
 
-def load_configuration() -> dict:
-    """Load project configuration info
+def locate_cleansed_data_folder() -> Path:
+    """Return path of the cleansed raw data folder
 
     Returns:
-        Dictionary of configuration info.
+        Path of cleansed raw data folder
     """
-    configuration = Path(locate_project_folder() / "configuration.json")
-    with configuration.open() as config_file:
-        return json.load(config_file)
+    return locate_data_folder() / OBSERVATIONS_FOLDER / CLEANSED_FOLDER
 
 
 def locate_current_script_folder() -> Path:

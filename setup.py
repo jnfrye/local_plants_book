@@ -4,7 +4,8 @@ import json
 
 
 # GLOBALS
-SRC_FOLDER = (Path(".") / "src").resolve()
+PROJECT_FOLDER = Path(".").resolve()
+SOURCE_FOLDER_NAME = "src"
 
 
 def add_project_to_pythonpath():
@@ -27,7 +28,7 @@ def add_project_to_pythonpath():
 
     # Write the path of the source code to the *.pth file
     with pth_file.open(mode='w') as pth:
-        pth.write(str(SRC_FOLDER))
+        pth.write(str(PROJECT_FOLDER / SOURCE_FOLDER_NAME))
 
     print("Wrote project directory to `{}` in site-packages.".format(
         pth_file.name
@@ -41,13 +42,12 @@ def create_config_file():
     customizable later.
     """
     # The default data folder is one directory above the project folder
-    project_folder = SRC_FOLDER.parent
-    data_folder_default = project_folder.parent / "data"
+    data_folder_default = PROJECT_FOLDER.parent / "data"
     data_folder = data_folder_default
 
     config_dict = {"data_folder": str(data_folder)}
     config_file_name = "configuration.json"
-    with (project_folder / config_file_name).open(mode='w') \
+    with (PROJECT_FOLDER / config_file_name).open(mode='w') \
             as config_file:
         json.dump(config_dict, config_file)
 
