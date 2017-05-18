@@ -11,6 +11,7 @@ OBSERVATIONS_FOLDER = "observation_data"
 RAW_OBSERVATIONS_FOLDER = "raw_observations"
 RAW_COUNTS_FOLDER = "raw_counts"
 CLEANSED_FOLDER = "cleansed"
+SCORES_FOLDER = "scored"
 
 
 def locate_source_folder() -> Path:
@@ -71,6 +72,15 @@ def locate_cleansed_data_folder() -> Path:
         Path of cleansed raw data folder
     """
     return locate_data_folder() / OBSERVATIONS_FOLDER / CLEANSED_FOLDER
+
+
+def locate_scores_folder() -> Path:
+    """Return path of the species scores folder
+
+    Returns:
+        Path of species scores folder
+    """
+    return locate_data_folder() / OBSERVATIONS_FOLDER / SCORES_FOLDER
 
 
 def locate_current_script_folder() -> Path:
