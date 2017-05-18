@@ -1,41 +1,55 @@
 import pandas as pd
 
-import pickle
 import argparse
 from difflib import get_close_matches
+
+import PyFloraBook.input_output.data_coordinator as dc
+
+
+# ---------------- GLOBALS ----------------
+# These are the weights used to create the final score (a weighted avg)
+WEIGHTS = {
+    "CalFlora":     1,
+    "OregonFlora":  1,
+    "CPNWH_OR":     1,
+    "CPNWH_WA":     1,
+    }
+WEBSITES = WEIGHTS.keys()
+INPUT_SUFFIX = "species"
+OUTPUT_SUFFIX = "scores"
 
 # ---------------- INPUT ----------------
 # Parse arguments
 parser = argparse.ArgumentParser(
-    description='Gather species counts for given families and analyze')
-parser.add_argument("-f", "--families", nargs='+',
-    help="Names of the families to be analyzed.")
+    description='Gather species counts for given families and analyze'
+    )
+parser.add_argument(
+    "-f", "--families", nargs='+',
+    help="Names of the families to be analyzed."
+    )
 args = parser.parse_args()
 families = args.families
 
-folder_names = [
-    "CalFlora", "OregonFlora", "CPNWH_OR", "CPNWH_WA"
-    ]
-
-# These are the weights used to create the final score (a weighted avg)
-weights = {
-    "CalFlora":     1,
-    "OregonFlora":  1,
-    "CPNWH_OR":     1,
-    "CPNWH_WA":     1
-    }
-weights_df = pd.DataFrame.from_dict(weights, orient="index")
+# Normalize the weights
+weights_df = pd.DataFrame.from_dict(WEIGHTS, orient="index")
 weights_df.columns = ["weight"]
-weights_df['normed'] = weights_df['weight'] / weights_df['weight'].sum(axis=0)
+weights_df['normed'] = \
+    weights_df['weight'] / weights_df['weight'].sum(axis=0)
+# TODO Refactor this into an `is_normalized(...)` function
 assert 0.999 < weights_df['normed'].sum(axis=0) < 1.001
 weights_df.drop('weight', axis=1, inplace=True)
 
+# Locate relevant folders
+cleansed_data_folder = dc.locate_cleansed_data_folder()
+scores_folder = dc.locate_scores_folder()
 for family in families:
     # Read data from files
     data_frames = dict()
-    for folder in folder_names:
-        data_frames[folder] = pd.read_csv(
-            "./data/" + folder + "/" + family + "_species.csv", index_col=0
+    for website in WEBSITES:
+        website_folder = cleansed_data_folder / website
+        website_data_file_name = family + "_" + INPUT_SUFFIX + ".csv"
+        data_frames[website] = pd.read_csv(
+            str(website_folder / website_data_file_name), index_col=0
             )
 
     # Normalize data and combine into a single dataframe
@@ -58,9 +72,9 @@ for family in families:
         if len(matched_pair) > 1 and matched_pair[::-1] not in close_matches:
             close_matches.append(matched_pair)
 
-    # Since the two rows are possibly just different spellings or synonyms, we 
-    # can confirm this by seeing if the rows are "disjoint"; that is, if no two 
-    # columns are both nonzero.
+    # Since the two rows are possibly just different spellings or synonyms,
+    # we can confirm this by seeing if the rows are "disjoint"; that is, if
+    # no two columns are both nonzero.
     for match in close_matches:
         matched_rows = normed_data.loc[match]
 
@@ -115,6 +129,7 @@ for family in families:
     print(normed_data["score"].sum(level="genus"))
     print(normed_data['score'])
 
-    #pickle.dump(normed_data, open("./scores/" + family + "_scores.p", "wb"))
-    normed_data.to_csv("./scores/" + family + "_scores.csv", columns=["score"])
-
+    scores_file_name = family + '_' + OUTPUT_SUFFIX + ".csv"
+    normed_data.to_csv(
+        str(scores_folder / scores_file_name), columns=["score"]
+        )
