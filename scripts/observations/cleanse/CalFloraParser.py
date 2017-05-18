@@ -7,6 +7,8 @@ import PyFloraBook.input_output.data_coordinator as dc
 
 # ---------------- GLOBALS ----------------
 WEBSITE = "CalFlora"
+INPUT_SUFFIX = "raw_data"
+OUTPUT_SUFFIX = "species"
 
 # ---------------- INPUT ----------------
 # Parse arguments
@@ -21,11 +23,12 @@ parser.add_argument(
 args = parser.parse_args()
 families = args.families
 
-raw_data_folder = dc.locate_raw_counts_folder() / WEBSITE
-cleansed_data_folder = dc.locate_cleansed_data_folder() / WEBSITE
+subfolder = WEBSITE
+raw_data_folder = dc.locate_raw_counts_folder() / subfolder
+cleansed_data_folder = dc.locate_cleansed_data_folder() / subfolder
 for family in families:
     # Remove the variety info
-    raw_data_file = raw_data_folder / (family + "_raw_data.csv")
+    raw_data_file = raw_data_folder / (family + "_" + INPUT_SUFFIX + ".csv")
     all_species = pd.read_csv(str(raw_data_file))
 
     # Strip the 'variety' and 'subspecies' nomenclature
@@ -44,5 +47,6 @@ for family in families:
     # Output
     print(family, '\t', species_counts['count'].sum(), '\t',
           len(species_counts))
-    cleansed_data_file = cleansed_data_folder / (family + '_species.csv')
+    cleansed_data_file = \
+        cleansed_data_folder / (family + '_' + OUTPUT_SUFFIX + '.csv')
     species_counts.to_csv(str(cleansed_data_file))
