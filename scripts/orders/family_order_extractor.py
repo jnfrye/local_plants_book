@@ -3,8 +3,17 @@ import pandas as pd
 import string
 import logging
 
+from PyFloraBook.in_out.data_coordinator import locate_orders_folder
 
-with open("APG_IV_families_and_orders.txt", 'r') as input_file:
+
+# Globals
+INPUT_FILE_NAME = "APG_IV_families_and_orders.txt"
+FAMILIES_FILE_NAME = "local_families.txt"
+OUTPUT_FILE_NAME = "local_families_and_orders.csv"
+
+# Input
+orders_folder = locate_orders_folder()
+with (orders_folder / INPUT_FILE_NAME).open() as input_file:
     family_info_lines = [l.strip().split(' = ') for l in input_file.readlines()]
 
 logging.info("Extract all non-latin characters found in input")
@@ -62,12 +71,12 @@ for line in family_info_lines:
         raise ValueError(
             'Line in input file has incorrect number of items: ' + str(line))
 
-with open("local_families.txt", 'r') as my_file:
-    my_families = my_file.read().splitlines()
+with (orders_folder / FAMILIES_FILE_NAME).open() as families_file:
+    local_families = families_file.read().splitlines()
 
 logging.info("For all accepted families, get their orders")
 local_orders = {}
-for family in my_families:
+for family in local_families:
     try:
         local_orders[family] = orders_of_families[family]
     except KeyError:
@@ -77,5 +86,4 @@ logging.info("Save the local family orders")
 local_orders_df = pd.DataFrame.from_dict(local_orders, orient='index')
 local_orders_df.index.name = "family"
 local_orders_df.columns = ["order"]
-local_orders_df.to_csv("local_families_and_orders.csv")
-
+local_orders_df.to_csv(str(orders_folder / OUTPUT_FILE_NAME))
