@@ -13,6 +13,9 @@ RAW_COUNTS_FOLDER = "raw_counts"
 CLEANSED_FOLDER = "cleansed"
 SCORES_FOLDER = "scored"
 SELECTIONS_FOLDER = "selected"
+NOMENCLATURE_FOLDER = "nomenclature"
+PHYLOGENY_FOLDER = "phylogeny"
+ORDERS_FOLDER = "orders"
 
 
 def locate_source_folder() -> Path:
@@ -53,8 +56,36 @@ def locate_raw_observations_folder() -> Path:
     Returns:
         Path of raw observations data folder
     """
-    return (locate_data_folder() / OBSERVATIONS_FOLDER /
-            RAW_OBSERVATIONS_FOLDER)
+    return (
+        locate_data_folder() / OBSERVATIONS_FOLDER / RAW_OBSERVATIONS_FOLDER
+        )
+
+
+def locate_nomenclature_folder() -> Path:
+    """Return path of the nomenclature data folder
+
+    Returns:
+        Path of nomenclature data folder
+    """
+    return locate_data_folder() / NOMENCLATURE_FOLDER
+
+
+def locate_orders_folder() -> Path:
+    """Return path of the orders data folder
+
+    Returns:
+        Path of orders data folder
+    """
+    return locate_data_folder() / ORDERS_FOLDER
+
+
+def locate_phylogeny_folder() -> Path:
+    """Return path of the phylogeny data folder
+
+    Returns:
+        Path of phylogeny data folder
+    """
+    return locate_data_folder() / PHYLOGENY_FOLDER
 
 
 def locate_raw_counts_folder() -> Path:
