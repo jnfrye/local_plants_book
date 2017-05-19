@@ -21,10 +21,10 @@ def locate_source_folder() -> Path:
     Returns:
         Path of the project source folder
     """
-    source_path = Path(inspect.getsourcefile(PyFloraBook)).parent
+    package_path = Path(inspect.getsourcefile(PyFloraBook)).parent
     # This assumes that the highest-level project __init__ file is contained
     # in a sub-folder of the project folder
-    return source_path.parent
+    return package_path.parent
 
 
 def load_configuration() -> dict:
