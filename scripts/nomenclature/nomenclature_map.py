@@ -2,4 +2,13 @@
 """
 import pandas as pd
 
-itis_results = pd.read_csv("search_result.csv", encoding = "ISO-8859-1")
+from PyFloraBook.in_out.data_coordinator import locate_nomenclature_folder
+
+
+# Globals
+INPUT_FILE_NAME = "search_results.csv"
+
+# Input
+nomenclature_folder = locate_nomenclature_folder()
+itis_results = pd.read_csv(
+    str(nomenclature_folder / INPUT_FILE_NAME), encoding="ISO-8859-1")
