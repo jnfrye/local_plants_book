@@ -4,7 +4,7 @@ import pandas as pd
 import argparse
 
 import PyFloraBook.web.communication as scraping
-import PyFloraBook.input_output.data_coordinator as dc
+import PyFloraBook.in_out.data_coordinator as dc
 
 
 # ---------------- GLOBALS ----------------

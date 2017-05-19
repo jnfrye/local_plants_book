@@ -9,7 +9,7 @@ import string
 
 import requests
 
-import PyFloraBook.input_output.data_coordinator as dc
+import PyFloraBook.in_out.data_coordinator as dc
 
 
 # Globals

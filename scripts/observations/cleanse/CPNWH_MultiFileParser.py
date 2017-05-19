@@ -6,7 +6,7 @@ import numpy as np
 
 import argparse
 
-import PyFloraBook.input_output.data_coordinator as dc
+import PyFloraBook.in_out.data_coordinator as dc
 
 
 # Globals

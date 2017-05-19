@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
 import PyFloraBook.web.communication as scraping
-import PyFloraBook.input_output.data_coordinator as dc
+import PyFloraBook.in_out.data_coordinator as dc
 
 
 # ---------------- GLOBALS ----------------

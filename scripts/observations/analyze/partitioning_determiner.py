@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 
-import PyFloraBook.input_output.data_coordinator as dc
+import PyFloraBook.in_out.data_coordinator as dc
 from PyFloraBook.threshold.partition import find_best_partitioning
 
 
