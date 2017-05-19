@@ -7,7 +7,7 @@ import PyFloraBook
 
 
 # Globals
-OBSERVATIONS_FOLDER = "observation_data"
+OBSERVATIONS_FOLDER = "observations"
 RAW_OBSERVATIONS_FOLDER = "raw_observations"
 RAW_COUNTS_FOLDER = "raw_counts"
 CLEANSED_FOLDER = "cleansed"
