@@ -4,14 +4,22 @@ import pandas as pd
 import argparse
 
 import PyFloraBook.web.communication as scraping
+import PyFloraBook.in_out.data_coordinator as dc
+
+
+# ---------------- GLOBALS ----------------
+SITE_NAME = "CalFlora"
 
 # ---------------- INPUT ----------------
 # Parse arguments
-parser = argparse.ArgumentParser(
-    description='Scrape CalFlora for species counts for given family')
-parser.add_argument("-f", "--families", nargs='+',
-    help="Names of the families to be analyzed.")
-args = parser.parse_args()
+PARSER = argparse.ArgumentParser(
+    description='Scrape CalFlora for species counts for given family'
+    )
+PARSER.add_argument(
+    "-f", "--families", nargs='+',
+    help="Names of the families to be analyzed."
+    )
+args = PARSER.parse_args()
 families = args.families
 
 # ---------------- SCRAPING ----------------
@@ -19,7 +27,8 @@ print("Opening browser...")
 browser = webdriver.Firefox()
 browser.set_window_size(500, 300)
 browser.set_window_position(200, 200)
-browser.set_page_load_timeout(8)
+
+output_path = dc.locate_raw_counts_folder() / SITE_NAME
 
 for family in families:
     # Load the webpage
@@ -47,9 +56,10 @@ for family in families:
 
     # ---------------- ANALYSIS ----------------
     # Convert to friendly format for writing CSV
+    family_results_path = str(output_path / (family + "_raw_data.csv"))
     all_species = pd.DataFrame(species_list, columns=["full_name", "count"])
     all_species.to_csv(
-        "./CalFlora/" + family + "_raw_data.csv",
+        family_results_path,
         columns=['full_name', 'count'], index=False
         )
 
@@ -57,6 +67,3 @@ for family in families:
     browser.get("about:blank")
 
 browser.quit()
-
-# ---------------- OUTPUT ----------------
-

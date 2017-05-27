@@ -15,3 +15,4 @@ analysis/scores/
 *.txt
 *.csv
 *.nwk
+configuration.json

@@ -5,42 +5,53 @@ import shutil
 import argparse
 import time
 import os.path
+from pathlib import Path
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
 import PyFloraBook.web.communication as scraping
+import PyFloraBook.in_out.data_coordinator as dc
+
+
+# ---------------- GLOBALS ----------------
+SITE_NAME = "OregonFlora"
 
 # ---------------- INPUT ----------------
 # Parse arguments
-parser = argparse.ArgumentParser(
-    description='Download family observation data from OregonFlora')
-parser.add_argument("-f", "--families", nargs='+',
-                    help="Names of the families to be analyzed.")
-ARGS = parser.parse_args()
-FAMILIES = ARGS.families
-
-FOLDER = './OregonFlora/'
+PARSER = argparse.ArgumentParser(
+    description='Download family observation data from OregonFlora'
+    )
+PARSER.add_argument(
+    "-f", "--families", nargs='+',
+    help="Names of the families to be analyzed."
+    )
+args = PARSER.parse_args()
+families = args.families
 
 # ---------------- SETUP ----------------
+download_dir = Path(os.getcwd())
 print("Opening browser...")
 # We have to set up the webdriver to automatically download files
 fp = webdriver.FirefoxProfile()
 fp.set_preference("browser.download.folderList", 2)
 fp.set_preference("browser.download.manager.showWhenStarting", False)
-fp.set_preference("browser.download.dir", os.getcwd())
+fp.set_preference("browser.download.dir", str(download_dir))
 fp.set_preference(
     "browser.helperApps.neverAsk.saveToDisk",
-    "application/csv; charset=UTF-8")
+    "application/csv; charset=UTF-8"
+    )
 
 browser = webdriver.Firefox(firefox_profile=fp)
 browser.set_window_size(500, 300)
 browser.set_window_position(200, 200)
 
+output_path = dc.locate_raw_observations_folder() / SITE_NAME
+
 # ---------------- SCRAPING ----------------
 # Load the search webpage
-for family in FAMILIES:
+for family in families:
     print("Loading atlas...")
     browser.get("http://www.oregonflora.org/atlas.php")
     scraping.wait_for_load(browser, "ID", "btnInstructions")
@@ -63,7 +74,6 @@ for family in FAMILIES:
     for i in range(6):
         # Delete whatever is already there
         start_year.send_keys(Keys.BACK_SPACE)
-
     start_year.send_keys("2002")
 
     # Submit form
@@ -72,9 +82,13 @@ for family in FAMILIES:
     print("Downloading data for " + family + "...")
     scraping.wait_for_load(browser, "ID", "downloadxls")
 
-    # Gotta check if there's a results.csv file already there
-    if os.path.isfile("results.csv"):
-        shutil.move("results.csv", "results.bkp.csv")
+    # This is the default file name when you download from OregonFlora
+    download_name = "results.csv"
+    temp_file_path = download_dir / download_name
+
+    # Check if the file already exists; rename if so
+    if os.path.isfile(str(temp_file_path)):
+        shutil.move(str(temp_file_path), str(temp_file_path) + ".bkp")
 
     # Click the download button
     time.sleep(.5)
@@ -84,12 +98,14 @@ for family in FAMILIES:
     while True:
         i += 1
         time.sleep(1)
-        if i >= 10 or os.path.isfile("results.csv"):
+        if i >= 10 or os.path.isfile(str(temp_file_path)):
             break
     time.sleep(.5)
 
-    shutil.move("results.csv", FOLDER + family + ".csv")
+    final_file_name = family + ".csv"
+    final_file_path = output_path / final_file_name
+
+    shutil.move(str(temp_file_path), str(final_file_path))
     print(family + " finished!")
-    browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
 
 browser.quit()

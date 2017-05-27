@@ -1,20 +1,34 @@
 import pandas as pd
+
 import argparse
+
+import PyFloraBook.in_out.data_coordinator as dc
+
+
+# ---------------- GLOBALS ----------------
+WEBSITE = 'OregonFlora'
+OUTPUT_SUFFIX = 'species'
 
 # ---------------- INPUT ----------------
 # Parse arguments
 parser = argparse.ArgumentParser(
-    description='Count the observed species')
-parser.add_argument("-f", "--families", nargs='+',
-    help="Names of the families to be analyzed.")
+    description='Count the observed species'
+    )
+parser.add_argument(
+    "-f", "--families", nargs='+',
+    help="Names of the families to be analyzed."
+    )
 args = parser.parse_args()
 families = args.families
 
-folder = './OregonFlora/'
-
+subfolder = WEBSITE
+raw_data_folder = dc.locate_raw_observations_folder() / subfolder
+cleansed_data_folder = dc.locate_cleansed_data_folder() / subfolder
 for family in families:
+    input_file_name = family + ".csv"
+    input_file_path = raw_data_folder / input_file_name
     try:
-        data = pd.read_csv(folder + family + '.csv', encoding="ISO-8859-1")
+        data = pd.read_csv(str(input_file_path), encoding="ISO-8859-1")
     except FileNotFoundError:
         print(family, "not found!")
         continue
@@ -27,7 +41,7 @@ for family in families:
     data = data[data['data_type'] != 'image']
     # Get rid of any data from the wrong counties
     excluded_counties = [
-        "Baker", "Crook", "Gilliam", "Grant", "Harney", "Lake", "Malheur", 
+        "Baker", "Crook", "Gilliam", "Grant", "Harney", "Lake", "Malheur",
         "Morrow", "Sherman", "Umatilla", "Union", "Wallowa", "Wheeler"
         ]
     for county in excluded_counties:
@@ -52,5 +66,6 @@ for family in families:
 
     # ---------------- OUTPUT ----------------
     print(family, '\t', len(all_observed), '\t', len(species_counts))
-    species_counts.to_csv(folder + family + '_species.csv')
 
+    cleansed_data_file_name = family + '_' + OUTPUT_SUFFIX + '.csv'
+    species_counts.to_csv(str(cleansed_data_folder / cleansed_data_file_name))
