@@ -4,6 +4,7 @@ import argparse
 from difflib import get_close_matches
 
 import PyFloraBook.in_out.data_coordinator as dc
+from PyFloraBook.calculate import scalar
 
 
 # ---------------- GLOBALS ----------------
@@ -35,8 +36,10 @@ weights_df = pd.DataFrame.from_dict(WEIGHTS, orient="index")
 weights_df.columns = ["weight"]
 weights_df['normed'] = \
     weights_df['weight'] / weights_df['weight'].sum(axis=0)
-# TODO Refactor this into an `is_normalized(...)` function
-assert 0.999 < weights_df['normed'].sum(axis=0) < 1.001
+
+weight_sum = weights_df['normed'].sum(axis=0)
+assert scalar.is_normed(weight_sum)
+
 weights_df.drop('weight', axis=1, inplace=True)
 
 # Locate relevant folders
@@ -56,7 +59,10 @@ for family in families:
     normed_data = pd.DataFrame()
     for key, df in data_frames.items():
         df['normed'] = df['count'] / df['count'].sum(axis=0)
-        assert 0.999 < df['normed'].sum(axis=0) < 1.001
+
+        normed_count_sum = df['normed'].sum(axis=0)
+        assert scalar.is_normed(normed_count_sum)
+
         df.drop('count', axis=1, inplace=True)
         normed_data = pd.concat([normed_data] + [df], axis=1)
         normed_data.columns = list(normed_data.columns[:-1]) + [key]
@@ -94,7 +100,7 @@ for family in families:
             "Should any be merged? If prefixed by ***, the rows are 'disjoint'"
             )
         for index, match in enumerate(close_matches):
-            print(match[2] + match[0] + "\n" + \
+            print(match[2] + match[0] + "\n" +
                   match[2] + match[1] + " " + str(index) + "\n")
 
         choices = input(
@@ -120,7 +126,9 @@ for family in families:
 
     # Create final score column
     normed_data['score'] = normed_data.dot(weights_df)
-    assert 0.999 < normed_data['score'].sum(axis=0) < 1.001
+
+    normed_data_sum = normed_data['score'].sum(axis=0)
+    assert scalar.is_normed(normed_data_sum)
 
     normed_data.index = pd.MultiIndex.from_tuples(
         list(map(tuple, normed_data.index.str.split())),
