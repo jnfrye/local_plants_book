@@ -117,7 +117,7 @@ for family in families:
         elif merge_direction == 'u':
             sign = +1
         else:
-            raise
+            raise Exception("THIS IS BAD")
 
         target, replacement = tuple(close_matches[index_choice][:2][::sign])
         del close_matches[index_choice]

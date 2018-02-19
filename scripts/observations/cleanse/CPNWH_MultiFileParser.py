@@ -50,10 +50,10 @@ for i in range(num_files):
         continue
     if df['Genus'].isnull().any():
         print("!!! ERROR: NULL GENUS FOUND !!!")
-        raise
+        raise Exception("!!! ERROR: NULL GENUS FOUND !!!")
     if df['Specimen Count'].isnull().any():
         print("!!! ERROR: NULL SPECIMEN COUNT FOUND !!!")
-        raise
+        raise Exception("!!! ERROR: NULL SPECIMEN COUNT FOUND !!!")
     datasets.append(df)
 
 # Combine the datasets
