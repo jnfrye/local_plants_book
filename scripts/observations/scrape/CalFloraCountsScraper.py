@@ -2,6 +2,7 @@ from selenium import webdriver
 import pandas as pd
 
 import argparse
+import os
 
 import PyFloraBook.web.communication as scraping
 import PyFloraBook.in_out.data_coordinator as dc
@@ -58,6 +59,7 @@ for family in families:
     # Convert to friendly format for writing CSV
     family_results_path = str(output_path / (family + "_raw_data.csv"))
     all_species = pd.DataFrame(species_list, columns=["full_name", "count"])
+    os.makedirs(output_path)
     all_species.to_csv(
         family_results_path,
         columns=['full_name', 'count'], index=False

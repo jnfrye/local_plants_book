@@ -4,6 +4,7 @@
 import shutil
 import argparse
 import time
+import os
 import os.path
 from pathlib import Path
 
@@ -105,6 +106,7 @@ for family in families:
     final_file_name = family + ".csv"
     final_file_path = output_path / final_file_name
 
+    os.makedirs(output_path)
     shutil.move(str(temp_file_path), str(final_file_path))
     print(family + " finished!")
 

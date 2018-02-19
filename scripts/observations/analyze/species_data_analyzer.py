@@ -2,6 +2,7 @@ import pandas as pd
 
 import argparse
 from difflib import get_close_matches
+import os
 
 import PyFloraBook.in_out.data_coordinator as dc
 from PyFloraBook.calculate import scalar
@@ -138,6 +139,7 @@ for family in families:
     print(normed_data['score'])
 
     scores_file_name = family + '_' + OUTPUT_SUFFIX + ".csv"
+    os.makedirs(scores_folder)
     normed_data.to_csv(
         str(scores_folder / scores_file_name), columns=["score"]
         )

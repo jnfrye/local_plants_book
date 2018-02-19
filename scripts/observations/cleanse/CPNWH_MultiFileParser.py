@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 
 import argparse
+import os
 
 import PyFloraBook.in_out.data_coordinator as dc
 
@@ -75,4 +76,5 @@ species_counts.columns = ['count']
 cleansed_data_folder = dc.locate_cleansed_data_folder() / subfolder
 cleansed_data_file = \
     cleansed_data_folder / (FILE_PREFIX + '_' + OUTPUT_SUFFIX + '.csv')
+os.makedirs(cleansed_data_folder)
 species_counts.to_csv(str(cleansed_data_file))

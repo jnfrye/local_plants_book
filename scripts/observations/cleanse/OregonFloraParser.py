@@ -1,6 +1,7 @@
 import pandas as pd
 
 import argparse
+import os
 
 import PyFloraBook.in_out.data_coordinator as dc
 
@@ -68,4 +69,5 @@ for family in families:
     print(family, '\t', len(all_observed), '\t', len(species_counts))
 
     cleansed_data_file_name = family + '_' + OUTPUT_SUFFIX + '.csv'
+    os.makedirs(cleansed_data_folder)
     species_counts.to_csv(str(cleansed_data_folder / cleansed_data_file_name))

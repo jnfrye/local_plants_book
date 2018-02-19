@@ -5,6 +5,7 @@ herbaria separately.
 """
 
 import argparse
+import os
 import string
 
 import requests
@@ -92,6 +93,7 @@ for i, herbarium in enumerate(HERBARIA):
 
     file_name = OUTPUT_FILE_PREFIX + "_part" + str(i) + ".txt"
     file_path = output_path / site_name / file_name
+    os.makedirs(output_path / site_name)
     with file_path.open(mode='w') as output_file:
         output_file.write(response.text)
 

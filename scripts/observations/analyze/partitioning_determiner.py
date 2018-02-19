@@ -1,4 +1,6 @@
 import argparse
+import os
+
 import pandas as pd
 
 import PyFloraBook.in_out.data_coordinator as dc
@@ -99,6 +101,6 @@ print(species_results)
 
 genus_output_name = family + '_genus_' + OUTPUT_SUFFIX + '.csv'
 species_output_name = family + '_species_' + OUTPUT_SUFFIX + '.csv'
+os.makedirs(selections_folder)
 genus_results.to_csv(str(selections_folder / genus_output_name))
 species_results.to_csv(str(selections_folder / species_output_name))
-
