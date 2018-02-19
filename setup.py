@@ -53,6 +53,7 @@ def create_config_file():
 
     print("Created project configuration file `{}`.".format(config_file_name))
 
+
 if __name__ == "__main__":
     add_project_to_pythonpath()
     create_config_file()
