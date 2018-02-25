@@ -8,11 +8,12 @@ def write(
         folder: os.path,
         filename: str,
         dataframe: pd.DataFrame,
-        columns: List[str]
+        columns_to_write: List[str] = None,
+        write_row_names: bool = True,
         ) -> None:
 
     os.makedirs(folder)
     dataframe.to_csv(
         folder / filename,
-        columns=columns, index=False
+        columns=columns_to_write, index=write_row_names
         )
