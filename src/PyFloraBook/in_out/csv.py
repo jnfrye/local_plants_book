@@ -12,7 +12,7 @@ def write(
         write_row_names: bool = True,
         ) -> None:
 
-    os.makedirs(folder)
+    os.makedirs(folder, exist_ok=True)
     dataframe.to_csv(
         folder / filename,
         columns=columns_to_write, index=write_row_names
