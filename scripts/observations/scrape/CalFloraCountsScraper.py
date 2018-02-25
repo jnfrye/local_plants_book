@@ -6,6 +6,7 @@ import os
 
 import PyFloraBook.web.communication as scraping
 import PyFloraBook.in_out.data_coordinator as dc
+import PyFloraBook.in_out.csv as csv
 
 
 # ---------------- GLOBALS ----------------
@@ -57,12 +58,12 @@ for family in families:
 
     # ---------------- ANALYSIS ----------------
     # Convert to friendly format for writing CSV
-    family_results_path = str(output_path / (family + "_raw_data.csv"))
-    all_species = pd.DataFrame(species_list, columns=["full_name", "count"])
-    os.makedirs(output_path)
-    all_species.to_csv(
-        family_results_path,
-        columns=['full_name', 'count'], index=False
+    output_columns = ["full_name", "count"]
+    all_species = pd.DataFrame(species_list, columns=output_columns)
+    csv.write(
+        output_path, family + "_raw_data.csv", all_species,
+        columns_to_write=output_columns,
+        write_row_names=False
         )
 
     # For whatever reason, it won't load the next page unless I do this
